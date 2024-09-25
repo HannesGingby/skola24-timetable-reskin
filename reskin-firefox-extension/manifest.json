@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "skola24 Timetable Reskin",
+  "short_name": "skola24 Skin",
+  "version": "1.0",
+  "description": "An extension to reskin a specific website.",
+  "permissions": ["activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["https://web.skola24.se/timetable/timetable-viewer/*"],
+      "css": ["style.css"],
+      "js": ["gsap.min.js", "content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["fonts/*", "assets/*"],
+      "matches": ["https://web.skola24.se/*"]
+    }
+  ],
+  "icons": {
+    "48": "assets/icon.png"
+  }
+}
