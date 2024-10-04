@@ -1,6 +1,6 @@
 //      skola24 Timetable Reskin
 
-// Utility Functions
+// Utility
 function createElementWithClass(element, classNames) {
     let newDiv = document.createElement(element);
 
@@ -121,6 +121,7 @@ window.addEventListener('load', function () {
         */
     }
 
+
     function classInputChange() {
         if (classSelection) {
             const inputElement = classSelection.querySelector("input");
@@ -158,6 +159,7 @@ window.addEventListener('load', function () {
         //console.log("Resized window");
     };
 
+
     function loadTimeout() {
         classSelection = document.querySelector('[data-identifier="KlassSelection"]');
 
@@ -178,7 +180,6 @@ window.addEventListener('load', function () {
             classInputChange();
         }
 
-
         // GSAP Animations
         gsap.from(".w-page-header", {
             opacity: 0,
@@ -192,7 +193,6 @@ window.addEventListener('load', function () {
             ease: "power1.in"
         })
         
-
         //  Create button elements for week switching
         const nextWeekButton = createElementWithClass("button", ["next-week-button"])
         nextWeekButton.innerHTML = "Next Week&nbsp;&nbsp;&nbsp;&#8618;";
@@ -200,7 +200,7 @@ window.addEventListener('load', function () {
         const previousWeekButton = createElementWithClass("button", ["previous-week-button"])
         previousWeekButton.innerHTML = "&#8617;&nbsp;&nbsp;&nbsp;Previous Week";
 
-        const additionRow = createElementWithClass("div", ["w-s6" , "w-m3", "w-l2", "addition-row"]);
+        const extraRow = createElementWithClass("div", ["w-s6" , "w-m3", "w-l2", "addition-row"]);
 
         const buttonWrapper = createElementWithClass("div", ["button-wrapper"]);
         buttonWrapper.append(previousWeekButton);
@@ -209,9 +209,9 @@ window.addEventListener('load', function () {
         const leftContent = createElementWithClass("div", ["left-content"]);
         const rightContent = createElementWithClass("div", ["right-content"]);
 
-        additionRow.append(leftContent);
-        additionRow.append(buttonWrapper);
-        additionRow.append(rightContent);
+        extraRow.append(leftContent);
+        extraRow.append(buttonWrapper);
+        extraRow.append(rightContent);
 
         function getSliderHtml() {
             const label = createElementWithClass("label", ["switch"]);
@@ -227,26 +227,9 @@ window.addEventListener('load', function () {
 
         rightContent.append(getSliderHtml());
 
-        function toggleSlider() {
-            const slider = document.querySelector("#slider");
-            const sliderLabel = document.querySelector(".slider");
-            const sliderInput = document.querySelector("#slider");
-
-            if (sliderInput.checked) {
-                sliderLabel.innerHTML = "On";
-                slider.checked = true;
-            } else {
-                sliderLabel.innerHTML = "Off";
-                slider.checked = false;
-            }
-        }
-
-        // Add the addition row to the DOM
+        // Add the extra row
         const wPanelFooter = document.querySelector(".w-panel-footer");
-        wPanelFooter.children[1].append(additionRow);
-        
-
-        
+        wPanelFooter.children[1].append(extraRow);
 
         const inputRows = wPanelFooter.children[0];
         inputRows.children[6].style.display = "none";
@@ -309,12 +292,10 @@ window.addEventListener('load', function () {
         const dropdownLis = weekInputWrapper.querySelector("ul").querySelectorAll("li");
         const dropdownArray = Array.from(dropdownLis);
         let currentWeekDataValue;
-        let currentWeekDataText;
         let currentWeekLiElement;
         let currentWeekLiElementIndex;
 
         let allowWeekChangePrevious = true;
-        let allowWeekChangeNext = true;
         let weekNumber;
 
         function updateCurrentWeek() {
@@ -324,12 +305,10 @@ window.addEventListener('load', function () {
             if (currentWeekLiElementIndex !== -1) {
                 currentWeekLiElement = dropdownArray[currentWeekLiElementIndex];
                 currentWeekDataValue = parseInt(currentWeekLiElement.getAttribute("data-value"));
-                currentWeekDataText = currentWeekLiElement.getAttribute("data-text");
 
                 //console.log("Element:", currentWeekLiElement);
                 //console.log("Index:", currentWeekLiElementIndex);
                 //console.log("Current data-value: " + currentWeekDataValue);
-                //console.log("Current data-text: " + currentWeekDataText);
             } else {
                 console.log("No element with the class 'w-selected' was found.");
             }
