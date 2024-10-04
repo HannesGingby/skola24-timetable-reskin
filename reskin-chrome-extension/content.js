@@ -83,8 +83,8 @@ window.addEventListener('load', function () {
         rects[0].style.fill = "none";
 
         if (slider.checked == true) {
-            gsap.fromTo("rect", {opacity:0}, {duration: 0.4, opacity:1, stagger: 0.03});
-            gsap.fromTo("text", {opacity:0}, {duration: 0.4, opacity:1, stagger: 0.01});
+            gsap.fromTo("rect", {opacity:0}, {duration: 0.4, opacity:1, stagger: 0.03, ease: "power1.inOut"});
+            gsap.fromTo("text", {opacity:0}, {duration: 0.4, opacity:1, stagger: 0.01, ease: "power1.inOut"});
         }
 
         styleTexts = Array.from(texts).slice(0, 25);
