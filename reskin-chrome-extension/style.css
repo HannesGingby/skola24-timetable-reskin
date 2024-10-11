@@ -2,6 +2,7 @@
     --background-color: #242425 !important;
     --second-background-color: #303333 !important;
     --hover-second-background-color: #3f4242 !important;
+    --hover-lighter-second-background-color: #575a5a !important;
     --graphics-color: #ccc2b1 !important;
     --highlight-color: #2b5f6d !important;
     --light-highlight-color: #458799 !important;
@@ -278,6 +279,14 @@ input:checked + .slider:before {
     position: absolute;
     top: 4px;
     left: -100px;
+}
+
+.slider:hover {
+    background-color: var(--hover-lighter-second-background-color);
+}
+
+.slider:checked:hover {
+    background-color: var(--light-highlight-color);
 }
 
 .timetable-wrapper {
