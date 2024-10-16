@@ -12,7 +12,6 @@ function createElementWithClass(element, classNames) {
 }
 
 
-
 const safetyDelay = 1000; //ms
 
 window.addEventListener('load', function () {
@@ -51,7 +50,6 @@ window.addEventListener('load', function () {
     }
     
     injectFavicon();
-
 
 
     // General Page Styling
@@ -128,7 +126,7 @@ window.addEventListener('load', function () {
             if (inputElement) {
                 const currentValue = inputElement.value;
                 if (currentValue !== "" && currentValue !== lastInputValue) {
-                    console.log(currentValue);
+                    //console.log(currentValue);
                     lastInputValue = currentValue;
 
                     waitForSvgAndStyle();
@@ -155,7 +153,8 @@ window.addEventListener('load', function () {
     }
 
     window.onresize = function() {
-        setTimeout(waitForSvgAndStyle, 50);
+        waitForSvgAndStyle();
+        //setTimeout(waitForSvgAndStyle, 50);
         //console.log("Resized window");
     };
 
@@ -227,10 +226,53 @@ window.addEventListener('load', function () {
 
         rightContent.append(getSliderHtml());
 
-        // Add the extra row
+        // Create a dropdown for option inputs
         const wPanelFooter = document.querySelector(".w-panel-footer");
-        wPanelFooter.children[1].append(extraRow);
+        const wPageHeader = document.querySelector(".w-page-header");
+        const wHeaderContainer = wPageHeader.children[0];
+        const wHeaderContent = wHeaderContainer.children[0];
+        const wHeaderFlexRight = wHeaderContent.children[1];
 
+        const dropdown = createElementWithClass("button", ["dropdown"]);
+        dropdown.innerHTML = "&#8711;";
+        wHeaderFlexRight.append(dropdown);
+        dropdown.classList = "w-button w-mb0 w-button-action w-button-flat w-condensed";
+
+        let isDropdownOpen = true;
+
+        dropdown.onclick = function() {
+            isDropdownOpen ? isDropdownOpen = false : isDropdownOpen = true;
+            isDropdownOpen ? dropdown.innerHTML = "&#8711;" : dropdown.innerHTML = "&#916;";
+
+            wPanelFooter.children[0].classList.toggle("display-none");
+            wPageHeader.classList.toggle("mb-3");
+
+            waitForSvgAndStyle();
+        }
+
+        const wHeaderFlexRightElems = Array.from(wHeaderFlexRight.children);
+
+        // Hide the help button
+        wHeaderFlexRightElems.forEach(elem => {
+            const helpButton = elem.querySelector('[title="Gå till hjälp"]');
+            if (helpButton) {
+                helpButton.style.display = "none";
+            }
+        });
+
+        /*
+        // Refresh timetable styling when switching day/week
+        const wButtonGroup = wPanelFooter.querySelector(".w-button-group");
+        console.log(wButtonGroup);
+
+        wButtonGroup.querySelector("li").onclick = function() {
+            setTimeout(waitForSvgAndStyle, 500);
+            //waitForSvgAndStyle();
+        }
+        */
+
+        // Add the extra row
+        wPanelFooter.children[1].append(extraRow);
         const inputRows = wPanelFooter.children[0];
         inputRows.children[6].style.display = "none";
 
