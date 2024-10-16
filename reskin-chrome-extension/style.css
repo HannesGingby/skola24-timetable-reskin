@@ -93,6 +93,23 @@ ul.w-menu {
     color: var(--graphics-color) !important;
 }
 
+/* Navbar option text */
+ul.w-menu .w-menu-item .w-content {
+    color: var(--graphics-color) !important;
+}
+
+.w-page-header .w-menu-item .w-mb0:hover {
+    background-color: unset !important;
+}
+
+.w-page-header .w-menu {
+    transition: background-color 200ms ease-in-out;
+}
+
+.w-page-header .w-menu:hover {
+    background-color: var(--hover-second-background-color) !important;
+}
+
 .a:link, a:visited {
     color: var(--light-highlight-color);
     text-decoration: none;
@@ -338,6 +355,12 @@ ul.w-list>li {
 
 .right-content {
     margin-top: 30px;
+}
+
+@media only screen and (max-width: 800px) {
+    .right-content .switch {
+        display: none;
+    }
 }
 
 @media only screen and (max-width: 600px) {

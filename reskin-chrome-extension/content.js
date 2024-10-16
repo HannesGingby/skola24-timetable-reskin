@@ -155,7 +155,7 @@ window.addEventListener('load', function () {
     }
 
     window.onresize = function() {
-        waitForSvgAndStyle();
+        setTimeout(waitForSvgAndStyle, 50);
         //console.log("Resized window");
     };
 
@@ -314,7 +314,7 @@ window.addEventListener('load', function () {
             }
         }
 
-        // Init values for the variables
+        // Init values
         updateCurrentWeek();
 
         let yearString = Math.abs(currentWeekDataValue).toString();
