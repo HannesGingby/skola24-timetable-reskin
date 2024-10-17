@@ -212,7 +212,7 @@ window.addEventListener('load', function () {
         extraRow.append(buttonWrapper);
         extraRow.append(rightContent);
 
-        function getSliderHtml() {
+        function createSliderHtml() {
             const label = createElementWithClass("label", ["switch"]);
             const input = createElementWithClass("input", []);
             input.type = "checkbox";
@@ -224,7 +224,21 @@ window.addEventListener('load', function () {
             return label;
         }
 
-        rightContent.append(getSliderHtml());
+
+        // Week num is buggy, fix when reaching the end of the year + end of available schedule time
+        const weekNumText = createElementWithClass("p", ["week-num"]);
+
+        function updateWeekNumText(week) {
+            const weekNumBold = createElementWithClass("b", []);
+            weekNumBold.innerHTML = week;
+            weekNumText.innerHTML = "Week ";
+            weekNumText.append(weekNumBold);
+        }
+
+        updateWeekNumText();
+
+        leftContent.append(weekNumText);
+        rightContent.append(createSliderHtml());
 
         // Create a dropdown for option inputs
         const wPanelFooter = document.querySelector(".w-panel-footer");
@@ -287,6 +301,7 @@ window.addEventListener('load', function () {
                     currentWeekLiElementIndex++;
 
                     weekNumber = Math.abs(currentWeekDataValue) % 100; // Last two digits (representing the week)
+                    updateWeekNumText(weekNumber);
 
                     if (weekNumber >= 52) {
                         year++;
@@ -305,6 +320,7 @@ window.addEventListener('load', function () {
                     }
 
                     weekNumber = Math.abs(currentWeekDataValue) % 100;
+                    updateWeekNumText(weekNumber);
 
                     if (weekNumber <= 0) {
                         year--;
@@ -358,6 +374,9 @@ window.addEventListener('load', function () {
 
         // Init values
         updateCurrentWeek();
+        // Get the weekNumber
+        weekChange("next");
+        weekChange("previous");
 
         let yearString = Math.abs(currentWeekDataValue).toString();
         let year = parseInt(yearString.slice(0, 4));
