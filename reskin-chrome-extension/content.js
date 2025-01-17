@@ -1,5 +1,39 @@
 //      skola24 Timetable Reskin
 
+// Config
+const configUrl = chrome.runtime.getURL("config.json");
+
+window.addEventListener('load', function () {
+    fetch(configUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Failed to fetch config.json: ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then(config => {
+      //console.log("Raw config:", JSON.stringify(config, null, 2));
+      console.log("Config loaded:", config);;
+  
+      //const root = document.querySelector(":root");
+      const root = document.documentElement;
+  
+      console.log(root);
+  
+      root.style.setProperty("--background-color", config["colors"]["backgroundColor"]);
+      root.style.setProperty("--second-background-color", config["colors"]["secondBackgroundColor"]);
+      root.style.setProperty("--hover-second-background-color", config["colors"]["hoverSecondBackgroundColor"]);
+      root.style.setProperty("--hover-lighter-second-background-color", config["colors"]["hoverLighterSecondBackgroundColor"]);
+      root.style.setProperty("--pass-through-highlight-color", config["colors"]["passThroughHighlightColor"]);
+      root.style.setProperty("--graphics-color", config["colors"]["graphicsColor"]);
+      root.style.setProperty("--highlight-color", config["colors"]["highlightColor"]);
+      root.style.setProperty("--light-highlight-color", config["colors"]["lightHighlightColor"]);
+    })
+    .catch(error => {
+      console.error("Error loading config.json:", error);
+    });
+});
+
 // Utility
 function createElementWithClass(element, classNames) {
     let newDiv = document.createElement(element);
@@ -224,7 +258,6 @@ window.addEventListener('load', function () {
             return label;
         }
 
-
         // Week num is buggy, fix when reaching the end of the year + end of available schedule time
         const weekNumText = createElementWithClass("p", ["week-num"]);
 
@@ -266,7 +299,7 @@ window.addEventListener('load', function () {
 
         const wHeaderFlexRightElems = Array.from(wHeaderFlexRight.children);
 
-        // Hide the help button
+        // Hide the help button (it is unnecessary I believe)
         wHeaderFlexRightElems.forEach(elem => {
             const helpButton = elem.querySelector('[title="Gå till hjälp"]');
             if (helpButton) {

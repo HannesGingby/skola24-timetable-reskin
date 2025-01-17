@@ -1,0 +1,48 @@
+
+
+#1, Pale Blue
+
+{
+    "colors": {
+        "backgroundColor": "#242425",
+        "secondBackgroundColor": "#303333",
+        "hoverSecondBackgroundColor": "#3f4242",
+        "hoverLighterSecondBackgroundColor": "#575a5a",
+        "passThroughHighlightColor": "rgba(43, 95, 109, 0.2)",
+        "graphicsColor": "#ccc2b1",
+        "highlightColor": "#2b5f6d",
+        "lightHighlightColor": "#458799"
+    }
+}
+
+
+#2, Pale Red
+
+{
+    "colors": {
+        "backgroundColor": "#242425",
+        "secondBackgroundColor": "#303333",
+        "hoverSecondBackgroundColor": "#3f4242",
+        "hoverLighterSecondBackgroundColor": "#575a5a",
+        "graphicsColor": "#D3C3C3",
+        "passThroughHighlightColor": "rgba(109, 43, 54, 0.2)",
+        "highlightColor": "#6D2B36",
+        "lightHighlightColor": "#994550"
+    }
+}
+
+
+#3, Pale Purple
+
+{
+    "colors": {
+        "backgroundColor": "#242425",
+        "secondBackgroundColor": "#303333",
+        "hoverSecondBackgroundColor": "#3f4242",
+        "hoverLighterSecondBackgroundColor": "#575a5a",
+        "graphicsColor": "#DACFD8",
+        "passThroughHighlightColor": "rgba(87, 35, 121, 0.2)",
+        "highlightColor": "#572379",
+        "lightHighlightColor": "#9A36C9"
+    }
+}

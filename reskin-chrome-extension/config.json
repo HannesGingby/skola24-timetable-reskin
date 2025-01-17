@@ -1,0 +1,12 @@
+{
+    "colors": {
+        "backgroundColor": "#242425",
+        "secondBackgroundColor": "#303333",
+        "hoverSecondBackgroundColor": "#3f4242",
+        "hoverLighterSecondBackgroundColor": "#575a5a",
+        "graphicsColor": "#DACFD8",
+        "passThroughHighlightColor": "rgba(87, 35, 121, 0.2)",
+        "highlightColor": "#572379",
+        "lightHighlightColor": "#9A36C9"
+    }
+}

@@ -1,12 +1,15 @@
+/*
 :root {
     --background-color: #242425 !important;
     --second-background-color: #303333 !important;
     --hover-second-background-color: #3f4242 !important;
     --hover-lighter-second-background-color: #575a5a !important;
     --graphics-color: #ccc2b1 !important;
+    --pass-through-highlight-color: rgba(43, 95, 109, 0.2) !important;
     --highlight-color: #2b5f6d !important;
     --light-highlight-color: #458799 !important;
 }
+*/
 
 /*   Font   */
 @font-face {
@@ -185,7 +188,7 @@ ul.w-button-group.w-primary > li .w-button {
 }
 
 ul.w-button-group.w-primary > li .w-button:hover {
-    background-color: rgba(43, 95, 109, 0.2) !important;
+    background-color: var(--pass-through-highlight-color) !important;
 }
 
 .next-week-button, .previous-week-button {
