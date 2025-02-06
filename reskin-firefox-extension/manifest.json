@@ -15,7 +15,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["fonts/*", "assets/*"],
+      "resources": ["fonts/*", "assets/*", "config.json"],
       "matches": ["https://web.skola24.se/*"]
     }
   ],

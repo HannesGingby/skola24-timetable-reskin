@@ -1,52 +1,45 @@
+/*
 :root {
     --background-color: #242425 !important;
     --second-background-color: #303333 !important;
     --hover-second-background-color: #3f4242 !important;
+    --hover-lighter-second-background-color: #575a5a !important;
     --graphics-color: #ccc2b1 !important;
+    --pass-through-highlight-color: rgba(43, 95, 109, 0.2) !important;
     --highlight-color: #2b5f6d !important;
     --light-highlight-color: #458799 !important;
 }
-
-/*   Font   */
-
-@font-face {
-    font-family: 'Helvetica Neue';
-    src: url('fonts/HelveticaNeue-Medium.otf');
-    font-weight: 400;
-}
-
-@font-face {
-    font-family: 'Helvetica Neue';
-    src: url('fonts/HelveticaNeue-Heavy.otf');
-    font-weight: 700;
-}
-
-@font-face {
-    font-family: 'Helvetica Neue';
-    src: url('fonts/HelveticaNeue-Condensed.otf');
-    font-weight: 900;
-}
-
-/*
-@font-face {
-    font-family: 'Helvetica Neue';
-    src: url('../chrome-extension://boddkhkbjdhojfhdlfajfafahdfiahek/fonts/HelveticaNeue-Medium.otf');
-    font-weight: 400;
-}
-
-@font-face {
-    font-family: 'Helvetica Neue';
-    src: url('../chrome-extension://boddkhkbjdhojfhdlfajfafahdfiahek/fonts/HelveticaNeue-Heavy.otf');
-    font-weight: 700;
-}
-
-@font-face {
-    font-family: 'Helvetica Neue';
-    src: url('../chrome-extension://boddkhkbjdhojfhdlfajfafahdfiahek/fonts/HelveticaNeue-Condensed.otf');
-    font-weight: 900;
-}
 */
 
+/*   Font   */
+@font-face {
+    font-family: 'Helvetica Neue';
+    src: url('../fonts/HelveticaNeue-Medium.otf');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'Helvetica Neue';
+    src: url('../fonts/HelveticaNeue-Heavy.otf');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'Helvetica Neue';
+    src: url('../fonts/HelveticaNeue-Condensed.otf');
+    font-weight: 900;
+}
+
+/* Utils */
+.display-none {
+    display: none !important;
+}
+
+.mb-3 {
+    margin-bottom: 3em !important;
+}
+
+/* Styling */
 button, textarea, input, label, .w-combobox, select, h1, h2, h3, h4, h5, h6, .w-h1, .w-h2, .w-h3, .w-h4, .w-h5, .w-h6 {
     font-family: 'Helvetica Neue', sans-serif !important;
     font-optical-sizing: auto !important;
@@ -83,6 +76,10 @@ h1 {
     height: 60px !important;
 }
 
+.w-page-header .w-flex-vertical-middle {
+    column-gap: 0.3em !important;
+}
+
 .w-container {
     max-width: unset !important;
     margin: unset !important;
@@ -111,6 +108,23 @@ h1 {
 ul.w-menu {
     background-color: var(--second-background-color) !important;
     color: var(--graphics-color) !important;
+}
+
+/* Navbar option text */
+ul.w-menu .w-menu-item .w-content {
+    color: var(--graphics-color) !important;
+}
+
+.w-page-header .w-menu-item .w-mb0:hover {
+    background-color: unset !important;
+}
+
+.w-page-header .w-menu {
+    transition: background-color 200ms ease-in-out;
+}
+
+.w-page-header .w-menu:hover {
+    background-color: var(--hover-second-background-color) !important;
 }
 
 .a:link, a:visited {
@@ -174,7 +188,7 @@ ul.w-button-group.w-primary > li .w-button {
 }
 
 ul.w-button-group.w-primary > li .w-button:hover {
-    background-color: rgba(43, 95, 109, 0.2) !important;
+    background-color: var(--pass-through-highlight-color) !important;
 }
 
 .next-week-button, .previous-week-button {
@@ -301,6 +315,14 @@ input:checked + .slider:before {
     left: -100px;
 }
 
+.slider:hover {
+    background-color: var(--hover-lighter-second-background-color);
+}
+
+.slider:checked:hover {
+    background-color: var(--light-highlight-color);
+}
+
 .timetable-wrapper {
     padding-inline: 4em !important;
 }
@@ -350,6 +372,19 @@ ul.w-list>li {
 
 .right-content {
     margin-top: 30px;
+}
+
+/* Week num text */
+.week-num {
+    color: var(--graphics-color) !important;
+    margin-top: 36px;
+    margin-bottom: 7.2px;
+}
+
+@media only screen and (max-width: 800px) {
+    .right-content .switch {
+        display: none;
+    }
 }
 
 @media only screen and (max-width: 600px) {

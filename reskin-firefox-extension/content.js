@@ -1,6 +1,38 @@
 //      skola24 Timetable Reskin
 
-// Utility Functions
+// Use browser.runtime if available (Firefox) or fallback to chrome.runtime (Chrome)
+const runtime = (typeof browser !== 'undefined' && browser.runtime) ? browser.runtime : chrome.runtime;
+const configUrl = runtime.getURL("config.json");
+
+// Config
+window.addEventListener('load', function () {
+    fetch(configUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to fetch config.json: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(config => {
+            console.log("Config loaded:", config);
+
+            const root = document.documentElement;
+            root.style.setProperty("--background-color", config["colors"]["backgroundColor"]);
+            root.style.setProperty("--second-background-color", config["colors"]["secondBackgroundColor"]);
+            root.style.setProperty("--hover-second-background-color", config["colors"]["hoverSecondBackgroundColor"]);
+            root.style.setProperty("--hover-lighter-second-background-color", config["colors"]["hoverLighterSecondBackgroundColor"]);
+            root.style.setProperty("--pass-through-highlight-color", config["colors"]["passThroughHighlightColor"]);
+            root.style.setProperty("--graphics-color", config["colors"]["graphicsColor"]);
+            root.style.setProperty("--highlight-color", config["colors"]["highlightColor"]);
+            root.style.setProperty("--light-highlight-color", config["colors"]["lightHighlightColor"]);
+        })
+        .catch(error => {
+            console.error("Error loading config.json:", error);
+        });
+});
+  
+
+// Utility
 function createElementWithClass(element, classNames) {
     let newDiv = document.createElement(element);
 
@@ -12,7 +44,6 @@ function createElementWithClass(element, classNames) {
 }
 
 
-
 const safetyDelay = 1000; //ms
 
 window.addEventListener('load', function () {
@@ -21,10 +52,17 @@ window.addEventListener('load', function () {
     const loadingText = createElementWithClass("p", ["reskin-loading-text"]);
 
     function initLoadingScreen() {
+        const header = document.querySelector(".w-page-header");
+        if (header) {
+          header.style.display = "none";
+        } else {
+          console.warn("Could not find element with class .w-page-header");
+        }
         document.body.append(loadingScreen);
         loadingText.innerHTML = "loading...";
         loadingScreen.append(loadingText);
     }
+      
 
     function removeLoadingScreen() {
         document.querySelector(".w-page-header").style.display = "unset";
@@ -38,46 +76,81 @@ window.addEventListener('load', function () {
 
     // Favicon
     function injectFavicon() {
-        //const faviconURL = chrome.runtime.getURL('assets/favicon.ico');
-        const faviconURL = browser.runtime.getURL('assets/favicon.ico');
-
+        // Remove any existing favicon link elements
+        document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]').forEach(link => link.remove());
+      
+        // Get the URL to the favicon within your extension
+        const faviconURL = runtime.getURL('assets/favicon.ico');
         const link = document.createElement("link");
         link.rel = "icon";
         link.type = "image/x-icon";
         link.href = faviconURL;
-    
+        
         document.head.appendChild(link);
     }
+      
     
     injectFavicon();
 
 
-
     // General Page Styling
-    const wFlexBetween = document.querySelector(".w-flex-between");
-    if (wFlexBetween) {
-        wFlexBetween.children[0].innerHTML = "Timetable";
+    let timetableWrapper;
+    let slider;
 
-        const wContainerTimetable = document.querySelector(".w-page-content .w-container");
-        const wPanelTimetable = wContainerTimetable.children[1];
-        const timetableWrapper = wPanelTimetable.children[0];
-        timetableWrapper.classList.add("timetable-wrapper");
+    function waitForFlexBetween(callback) {
+        const wFlexBetween = document.querySelector(".w-flex-between");
+        if (wFlexBetween && wFlexBetween.children[0]) {
+        // Element is available, call the callback and pass it
+        callback(wFlexBetween);
+        } else {
+        // Check again after a short delay
+        setTimeout(() => waitForFlexBetween(callback), 100);
+        }
     }
-
-    document.querySelector(".w-timetable img").style.display = "none";
-
-    /*
-    const wContainerTimetable = document.querySelector(".w-page-content .w-container");
-    const wPanelTimetable = wContainerTimetable.children[1];
-    const timetableWrapper = wPanelTimetable.children[0];
-    timetableWrapper.classList.add("timetable-wrapper");
-    */
+    
+    // Call the function with a callback that contains the code that depends on wFlexBetween
+    waitForFlexBetween(function(wFlexBetween) {
+        // Now that we know wFlexBetween exists, we can safely access it
+        wFlexBetween.children[0].innerHTML = "Timetable";
+    
+        // Continue with your dependent code:
+        const wTimetableImg = document.querySelector(".w-timetable img");
+        if (wTimetableImg) {
+        wTimetableImg.style.display = "none";
+        } else {
+        console.warn("Could not find the timetable image element.");
+        }
+    
+        const wContainerTimetable = document.querySelector(".w-page-content .w-container");
+        if (wContainerTimetable && wContainerTimetable.children[1]) {
+            const wPanelTimetable = wContainerTimetable.children[1];
+            if (wPanelTimetable.children[0]) {
+                timetableWrapper = wPanelTimetable.children[0];
+                timetableWrapper.classList.add("timetable-wrapper");
+            } else {
+                console.warn("Could not find the timetable wrapper inside wPanelTimetable.");
+            }
+        } else {
+        console.warn("Could not find wContainerTimetable or its expected child.");
+        }
+    });
+  
+    
     
     // Timetable SVG Styling
     let classSelection;
     let lastInputValue = "";
 
-    let slider;
+    let lessonColorHue = 0;
+
+    // Continuously rotate the hue
+    function rotateHue(lessonRects) {
+        lessonColorHue = (lessonColorHue + 1) % 360; // Increment hue and loop back after 360
+        lessonRects.forEach(rect => {
+            rect.style.filter = `hue-rotate(${lessonColorHue}deg)`; // Apply the hue rotation
+        });
+        requestAnimationFrame(() => rotateHue(lessonRects)); // Continuously update
+    }
     
     function styleTimetableSvg() {
         // Published Time Text
@@ -91,12 +164,9 @@ window.addEventListener('load', function () {
 
         rects[0].style.fill = "none";
 
-        slider = document.querySelector(".slider");
-
-        if (slider.checked == true) {
-            console.log("Slider is checked");
-            gsap.fromTo("rect", {opacity:0}, {duration: 0.4, opacity:1, stagger: 0.03});
-            gsap.fromTo("text", {opacity:0}, {duration: 0.4, opacity:1, stagger: 0.01});
+        if (slider && slider.checked) {
+            gsap.fromTo("rect", {opacity: 0}, {duration: 0.4, opacity: 1, stagger: 0.03, ease: "power1.inOut"});
+            gsap.fromTo("text", {opacity: 0}, {duration: 0.4, opacity: 1, stagger: 0.01, ease: "power1.inOut"});
         }
 
         styleTexts = Array.from(texts).slice(0, 25);
@@ -110,7 +180,7 @@ window.addEventListener('load', function () {
         rects[11].style.fill = "var(--hover-second-background-color)";
         rects[11].style.strokeWidth = "0px";
 
-        dayLabelRects = Array.from(rects).slice(1, 6);
+        let dayLabelRects = Array.from(rects).slice(1, 6);
 
         dayLabelRects.forEach(rect => {
             rect.style.fill = "var(--hover-second-background-color)";
@@ -124,14 +194,19 @@ window.addEventListener('load', function () {
             rect.style.fill = "var(--second-background-color)";
         })
 
-        /*
-        lessonRects = Array.from(rects).slice(13, 37);
+        let lessonRects = [];
 
-        lessonRects.forEach(rect => {
-            rect.style.fill = "var(--second-background-color)";
+        // Get every lesson rectangle, it has the box-type="Lesson" attribute
+        rects.forEach(rect => {
+            if (rect.getAttribute("box-type") === "Lesson") {
+                lessonRects.push(rect);
+            }
         })
-        */
+
+        // Start the hue rotation animation
+        //rotateHue(lessonRects);
     }
+
 
     function classInputChange() {
         if (classSelection) {
@@ -139,8 +214,12 @@ window.addEventListener('load', function () {
             if (inputElement) {
                 const currentValue = inputElement.value;
                 if (currentValue !== "" && currentValue !== lastInputValue) {
-                    console.log(currentValue);
+                    //console.log(currentValue);
                     lastInputValue = currentValue;
+
+                    // Hide filters
+                    const toggleDropdownButton = document.querySelector(".toggle-dropdown-button");
+                    toggleDropdownButton.click();
 
                     waitForSvgAndStyle();
                 }
@@ -149,9 +228,11 @@ window.addEventListener('load', function () {
     }
 
     function waitForSvgAndStyle() {
-        const wContainerTimetable = document.querySelector(".w-page-content .w-container");
-        const wPanelTimetable = wContainerTimetable.children[1];
-        const timetableWrapper = wPanelTimetable.children[0];
+        if (!timetableWrapper) {
+            console.warn("timetableWrapper not defined yet.");
+            return;
+        }
+
         const observer = new MutationObserver((mutationsList, observer) => {
             for (const mutation of mutationsList) {
                 if (mutation.type === 'childList') {
@@ -170,8 +251,10 @@ window.addEventListener('load', function () {
 
     window.onresize = function() {
         waitForSvgAndStyle();
+        //setTimeout(waitForSvgAndStyle, 50);
         //console.log("Resized window");
     };
+
 
     function loadTimeout() {
         classSelection = document.querySelector('[data-identifier="KlassSelection"]');
@@ -193,7 +276,6 @@ window.addEventListener('load', function () {
             classInputChange();
         }
 
-
         // GSAP Animations
         gsap.from(".w-page-header", {
             opacity: 0,
@@ -207,7 +289,6 @@ window.addEventListener('load', function () {
             ease: "power1.in"
         })
         
-
         //  Create button elements for week switching
         const nextWeekButton = createElementWithClass("button", ["next-week-button"])
         nextWeekButton.innerHTML = "Next Week&nbsp;&nbsp;&nbsp;&#8618;";
@@ -215,7 +296,7 @@ window.addEventListener('load', function () {
         const previousWeekButton = createElementWithClass("button", ["previous-week-button"])
         previousWeekButton.innerHTML = "&#8617;&nbsp;&nbsp;&nbsp;Previous Week";
 
-        const additionRow = createElementWithClass("div", ["w-s6" , "w-m3", "w-l2", "addition-row"]);
+        const extraRow = createElementWithClass("div", ["w-s6" , "w-m3", "w-l2", "addition-row"]);
 
         const buttonWrapper = createElementWithClass("div", ["button-wrapper"]);
         buttonWrapper.append(previousWeekButton);
@@ -224,48 +305,87 @@ window.addEventListener('load', function () {
         const leftContent = createElementWithClass("div", ["left-content"]);
         const rightContent = createElementWithClass("div", ["right-content"]);
 
-        additionRow.append(leftContent);
-        additionRow.append(buttonWrapper);
-        additionRow.append(rightContent);
+        extraRow.append(leftContent);
+        extraRow.append(buttonWrapper);
+        extraRow.append(rightContent);
 
-        function getSliderHtml() {
+        function createSliderHtml() {
             const label = createElementWithClass("label", ["switch"]);
             const input = createElementWithClass("input", []);
             input.type = "checkbox";
             input.id = "slider";
-
+            slider = input;  // Store the reference globally.
+        
             label.append(input);
             label.append(createElementWithClass("span", ["slider"]));
-
+        
             return label;
         }
 
-        rightContent.append(getSliderHtml());
+        // Week num is buggy, fix when reaching the end of the year + end of available schedule time
+        const weekNumText = createElementWithClass("p", ["week-num"]);
 
-        function toggleSlider() {
-            const slider = document.querySelector("#slider");
-            const sliderLabel = document.querySelector(".slider");
-            const sliderInput = document.querySelector("#slider");
-
-            if (sliderInput.checked) {
-                sliderLabel.innerHTML = "On";
-                slider.checked = true;
-            } else {
-                sliderLabel.innerHTML = "Off";
-                slider.checked = false;
-            }
+        function updateWeekNumText(week) {
+            const weekNumBold = createElementWithClass("b", []);
+            weekNumBold.innerHTML = week;
+            weekNumText.innerHTML = "Week ";
+            weekNumText.append(weekNumBold);
         }
 
-        // Add the addition row to the DOM
+        updateWeekNumText();
+
+        leftContent.append(weekNumText);
+        rightContent.append(createSliderHtml());
+
+        // Create a dropdown for option inputs
         const wPanelFooter = document.querySelector(".w-panel-footer");
-        if (wPanelFooter) {
-            wPanelFooter.children[1].append(additionRow);
+        const wPageHeader = document.querySelector(".w-page-header");
+        const wHeaderContainer = wPageHeader.children[0];
+        const wHeaderContent = wHeaderContainer.children[0];
+        const wHeaderFlexRight = wHeaderContent.children[1];
+
+        const dropdown = createElementWithClass("button", ["dropdown"]);
+        dropdown.innerHTML = "&#8711;";
+        wHeaderFlexRight.append(dropdown);
+        dropdown.classList = "w-button w-mb0 w-button-action w-button-flat w-condensed toggle-dropdown-button";
+
+        let isDropdownOpen = true;
+
+        dropdown.onclick = function() {
+            isDropdownOpen ? isDropdownOpen = false : isDropdownOpen = true;
+            isDropdownOpen ? dropdown.innerHTML = "&#8711;" : dropdown.innerHTML = "&#916;";
+
+            wPanelFooter.children[0].classList.toggle("display-none");
+            wPageHeader.classList.toggle("mb-3");
+
+            waitForSvgAndStyle();
         }
-        
+
+        const wHeaderFlexRightElems = Array.from(wHeaderFlexRight.children);
+
+        // Hide the help button (it is unnecessary I believe)
+        wHeaderFlexRightElems.forEach(elem => {
+            const helpButton = elem.querySelector('[title="Gå till hjälp"]');
+            if (helpButton) {
+                helpButton.style.display = "none";
+            }
+        });
+
+        /*
+        // Refresh timetable styling when switching day/week
+        const wButtonGroup = wPanelFooter.querySelector(".w-button-group");
+        console.log(wButtonGroup);
+
+        wButtonGroup.querySelector("li").onclick = function() {
+            setTimeout(waitForSvgAndStyle, 500);
+            //waitForSvgAndStyle();
+        }
+        */
+
+        // Add the extra row
+        wPanelFooter.children[1].append(extraRow);
         const inputRows = wPanelFooter.children[0];
-        if (inputRows) {
-            inputRows.children[6].style.display = "none";
-        }
+        inputRows.children[6].style.display = "none";
 
         function weekChange(type) {
             if (type != "next" && type != "previous") {
@@ -278,6 +398,7 @@ window.addEventListener('load', function () {
                     currentWeekLiElementIndex++;
 
                     weekNumber = Math.abs(currentWeekDataValue) % 100; // Last two digits (representing the week)
+                    updateWeekNumText(weekNumber);
 
                     if (weekNumber >= 52) {
                         year++;
@@ -296,6 +417,7 @@ window.addEventListener('load', function () {
                     }
 
                     weekNumber = Math.abs(currentWeekDataValue) % 100;
+                    updateWeekNumText(weekNumber);
 
                     if (weekNumber <= 0) {
                         year--;
@@ -325,12 +447,10 @@ window.addEventListener('load', function () {
         const dropdownLis = weekInputWrapper.querySelector("ul").querySelectorAll("li");
         const dropdownArray = Array.from(dropdownLis);
         let currentWeekDataValue;
-        let currentWeekDataText;
         let currentWeekLiElement;
         let currentWeekLiElementIndex;
 
         let allowWeekChangePrevious = true;
-        let allowWeekChangeNext = true;
         let weekNumber;
 
         function updateCurrentWeek() {
@@ -340,19 +460,20 @@ window.addEventListener('load', function () {
             if (currentWeekLiElementIndex !== -1) {
                 currentWeekLiElement = dropdownArray[currentWeekLiElementIndex];
                 currentWeekDataValue = parseInt(currentWeekLiElement.getAttribute("data-value"));
-                currentWeekDataText = currentWeekLiElement.getAttribute("data-text");
 
                 //console.log("Element:", currentWeekLiElement);
                 //console.log("Index:", currentWeekLiElementIndex);
                 //console.log("Current data-value: " + currentWeekDataValue);
-                //console.log("Current data-text: " + currentWeekDataText);
             } else {
                 console.log("No element with the class 'w-selected' was found.");
             }
         }
 
-        // Init values for the variables
+        // Init values
         updateCurrentWeek();
+        // Get the weekNumber
+        weekChange("next");
+        weekChange("previous");
 
         let yearString = Math.abs(currentWeekDataValue).toString();
         let year = parseInt(yearString.slice(0, 4));

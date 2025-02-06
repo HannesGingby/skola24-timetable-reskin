@@ -101,6 +101,17 @@ window.addEventListener('load', function () {
     // Timetable SVG Styling
     let classSelection;
     let lastInputValue = "";
+
+    let lessonColorHue = 0;
+
+    // Continuously rotate the hue
+    function rotateHue(lessonRects) {
+        lessonColorHue = (lessonColorHue + 1) % 360; // Increment hue and loop back after 360
+        lessonRects.forEach(rect => {
+            rect.style.filter = `hue-rotate(${lessonColorHue}deg)`; // Apply the hue rotation
+        });
+        requestAnimationFrame(() => rotateHue(lessonRects)); // Continuously update
+    }
     
     function styleTimetableSvg() {
         // Published Time Text
@@ -130,7 +141,7 @@ window.addEventListener('load', function () {
         rects[11].style.fill = "var(--hover-second-background-color)";
         rects[11].style.strokeWidth = "0px";
 
-        dayLabelRects = Array.from(rects).slice(1, 6);
+        let dayLabelRects = Array.from(rects).slice(1, 6);
 
         dayLabelRects.forEach(rect => {
             rect.style.fill = "var(--hover-second-background-color)";
@@ -144,13 +155,17 @@ window.addEventListener('load', function () {
             rect.style.fill = "var(--second-background-color)";
         })
 
-        /*
-        lessonRects = Array.from(rects).slice(13, 37);
+        let lessonRects = [];
 
-        lessonRects.forEach(rect => {
-            rect.style.fill = "var(--second-background-color)";
+        // Get every lesson rectangle, it has the box-type="Lesson" attribute
+        rects.forEach(rect => {
+            if (rect.getAttribute("box-type") === "Lesson") {
+                lessonRects.push(rect);
+            }
         })
-        */
+
+        // Start the hue rotation animation
+        //rotateHue(lessonRects);
     }
 
 
@@ -162,6 +177,10 @@ window.addEventListener('load', function () {
                 if (currentValue !== "" && currentValue !== lastInputValue) {
                     //console.log(currentValue);
                     lastInputValue = currentValue;
+
+                    // Hide filters
+                    const toggleDropdownButton = document.querySelector(".toggle-dropdown-button");
+                    toggleDropdownButton.click();
 
                     waitForSvgAndStyle();
                 }
@@ -283,7 +302,7 @@ window.addEventListener('load', function () {
         const dropdown = createElementWithClass("button", ["dropdown"]);
         dropdown.innerHTML = "&#8711;";
         wHeaderFlexRight.append(dropdown);
-        dropdown.classList = "w-button w-mb0 w-button-action w-button-flat w-condensed";
+        dropdown.classList = "w-button w-mb0 w-button-action w-button-flat w-condensed toggle-dropdown-button";
 
         let isDropdownOpen = true;
 
