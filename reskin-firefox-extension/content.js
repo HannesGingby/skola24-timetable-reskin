@@ -213,6 +213,12 @@ window.addEventListener('load', function () {
             const inputElement = classSelection.querySelector("input");
             if (inputElement) {
                 const currentValue = inputElement.value;
+
+                // Change page title
+                if (currentValue.includes("TE")) {
+                    document.title = "Schema " + currentValue;
+                }
+
                 if (currentValue !== "" && currentValue !== lastInputValue) {
                     //console.log(currentValue);
                     lastInputValue = currentValue;
